@@ -12,9 +12,9 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
   bool? check_tip = false;
 
   //สร้างออปเจ็กต์เพื่อนำไปใช้ควบคุม TextField ในหน้าจอที่สร้างไว้
-  TextEditingController? money_Ctrl = TextEditingController();
-  TextEditingController? person_Ctrl = TextEditingController();
-  TextEditingController? tip_Ctrl = TextEditingController();
+  TextEditingController? money_ctrl = TextEditingController();
+  TextEditingController? person_ctrl = TextEditingController();
+  TextEditingController? tip_ctrl = TextEditingController();
 
   //เมธอด -> โค้ดแสดง Dialog เตือน โดยจะรับข้อความมาแสดงที่ Dialog
   showWarningDialog(context, msg) {
@@ -94,7 +94,7 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
                   top: 40.0,
                 ),
                 child: TextField(
-                  controller: money_Ctrl,
+                  controller: money_ctrl,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     focusedBorder: UnderlineInputBorder(
@@ -125,7 +125,7 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
                   top: 20.0,
                 ),
                 child: TextField(
-                  controller: person_Ctrl,
+                  controller: person_ctrl,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     focusedBorder: UnderlineInputBorder(
@@ -180,7 +180,7 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
                   top: 5.0,
                 ),
                 child: TextField(
-                  controller: tip_Ctrl,
+                  controller: tip_ctrl,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     focusedBorder: UnderlineInputBorder(
@@ -209,26 +209,33 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (money_Ctrl!.text.length == 0) {
-                    //.length นับจำนวนตัวอักษร
-                    //แสดงช้อความเตือน
+                  //สร้างตัวแปรเก็บผลลัพธ์ที่ได้จากการคำนวณ
+                  double? moneyshare =0;
+
+                  //ตรวจสอบและคำนวณ
+                  if (money_ctrl!.text.isEmpty) {
                     showWarningDialog(context, 'ป้อนจำนวนเงินด้วย');
                     return;
-                  } else if (person_Ctrl!.text.length == 0) {
-                    //แสดงข้อความเตือน
+                  } else if (person_ctrl!.text.length == 0) {
                     showWarningDialog(context, 'ป้อนจำนวนคนด้วย');
                     return;
-                  } else if (check_tip! == true) {
-                    if (tip_Ctrl!.text.length == 0) {
-                      //แสดง MSG เตือน
-                      showWarningDialog(context, 'ป้อนจำนวนเงินทิปด้วย');
-                      return;
-                    } else {
-                      //คำนวณ (เงิน + ทิป) / คน
-
-                    }
+                  } else if ( check_tip! == false ) {
+                    //คำนวณแบบไม่มี tip
+                    double? money = double.parse( money_ctrl.text ) ;
+                    int? person = int.parse(person_ctrl.text) ;
+                    moneyshare = money / person ;
                   } else {
-                    //คำนวณ เงิน/คน
+                    // ตรวจสอบว่าได้ป้อน tip หรือยัง
+                    if (tip_ctrl.text.isEmpty){
+                      showWarningDialog(context, 'ป้อนทิปด้วย...');
+                      return;                     
+                    } else {
+                      //คำนวณแบบมี tip
+                      double? money = double.parse( money_ctrl.text );
+                      int? person = int.parse(person_ctrl.text);
+                      double? tip = double.parse( tip_ctrl.text );
+                      moneyshare = (money+tip) / person ;
+                    }
                   }
                 },
                 child: Text(
@@ -254,9 +261,9 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
                 onPressed: () {
                   //เขียน Logic การทำงานโดยจะเคลียร์ค่าทุกอย่างบนหน้าจอกลับเป้นเหมือนเดิม
                   setState(() {
-                    money_Ctrl!.text = ''; // ใช้ " " ก็ได้
-                    person_Ctrl!.text = '';
-                    tip_Ctrl!.text = '';
+                    money_ctrl!.text = ''; // ใช้ " " ก็ได้
+                    person_ctrl!.text = '';
+                    tip_ctrl!.text = '';
                     check_tip = false;
                   });
                 },
