@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_moneyshare/views/show_moneyshare_ui.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MoneyshareUI extends StatefulWidget {
@@ -156,9 +157,12 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Checkbox(
-                    onChanged: (val) {
+                    onChanged: (checked) {
                       setState(() {
-                        check_tip = val;
+                        check_tip = checked;
+                        if(checked == false) {
+                          tip_ctrl!.text = '';
+                        }
                       });
                     },
                     value: check_tip,
@@ -221,22 +225,35 @@ class _MoneyshareUIState extends State<MoneyshareUI> {
                     return;
                   } else if ( check_tip! == false ) {
                     //คำนวณแบบไม่มี tip
-                    double? money = double.parse( money_ctrl.text ) ;
-                    int? person = int.parse(person_ctrl.text) ;
+                    double? money = double.parse( money_ctrl!.text ) ;
+                    int? person = int.parse(person_ctrl!.text) ;
                     moneyshare = money / person ;
                   } else {
                     // ตรวจสอบว่าได้ป้อน tip หรือยัง
-                    if (tip_ctrl.text.isEmpty){
+                    if (tip_ctrl!.text.isEmpty){
                       showWarningDialog(context, 'ป้อนทิปด้วย...');
                       return;                     
                     } else {
                       //คำนวณแบบมี tip
-                      double? money = double.parse( money_ctrl.text );
-                      int? person = int.parse(person_ctrl.text);
-                      double? tip = double.parse( tip_ctrl.text );
+                      double? money = double.parse( money_ctrl!.text );
+                      int? person = int.parse(person_ctrl!.text);
+                      double? tip = double.parse( tip_ctrl!.text );
                       moneyshare = (money+tip) / person ;
                     }
                   }
+
+                      //ส่งข้อมูลที่ป้อน และที่คำนวณได้ไปแสดงอีกหน้า ShowMoneyshareUI
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context)=>ShowMoneyshareUI(
+                            money: double.parse( money_ctrl!.text ),
+                            person: int.parse(person_ctrl!.text),
+                            tip: double.parse( tip_ctrl!.text.isEmpty ? '0' : tip_ctrl!.text ),
+                            moneyshare: moneyshare,
+                          ),
+                        ),
+                      );
                 },
                 child: Text(
                   'คำนวณ',
